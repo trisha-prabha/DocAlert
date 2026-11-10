@@ -1,6 +1,12 @@
-import resend from '../config/mailer.js';
-import { daysUntil } from '../utils/dateCalc.js';
-import { format } from 'date-fns';
+import resend from "../config/mailer.js";
+import { daysUntil } from "../utils/dateCalc.js";
+import { format } from "date-fns";
+
+/** Resend display name. Keeps an address that already includes a name. */
+const formatFromAddress = (rawFrom) => {
+  const address = rawFrom || "onboarding@resend.dev";
+  return address.includes("<") ? address : `DocAlert <${address}>`;
+};
 
 /**
  * Dispatches an automated warranty/document expiration reminder email via Resend
@@ -10,25 +16,29 @@ import { format } from 'date-fns';
  */
 export const sendReminderEmail = async (item, user) => {
   if (!user?.email) {
-    throw new Error(`Failed to send reminder for item ${item?._id}: User has no email address`);
+    throw new Error(
+      `Failed to send reminder for item ${item?._id}: User has no email address`,
+    );
   }
 
   const daysLeft = daysUntil(item.expiryDate);
   const expiryFormatted = item.expiryDate
-    ? format(new Date(item.expiryDate), 'MMMM d, yyyy')
-    : 'N/A';
+    ? format(new Date(item.expiryDate), "MMMM d, yyyy")
+    : "N/A";
 
-  const subject = daysLeft > 0
-    ? `⏳ Action Required: ${item.productName} expires in ${daysLeft} day${daysLeft === 1 ? '' : 's'}`
-    : `⚠️ Expiry Alert: ${item.productName} has expired`;
+  const subject =
+    daysLeft > 0
+      ? `⏳ DocAlert: ${item.productName} expires in ${daysLeft} day${daysLeft === 1 ? "" : "s"}`
+      : `⚠️ DocAlert: ${item.productName} has expired`;
 
-  const urgencyPill = daysLeft > 0
-    ? `<span style="display:inline-block; background:rgba(245,158,11,0.18); color:#f59e0b; font-weight:800; font-size:12px; padding:6px 14px; border-radius:20px; border:1px solid #f59e0b; letter-spacing:0.5px;">⏳ EXPIRES IN ${daysLeft} DAY${daysLeft === 1 ? '' : 'S'}</span>`
-    : `<span style="display:inline-block; background:rgba(239,68,68,0.18); color:#ef4444; font-weight:800; font-size:12px; padding:6px 14px; border-radius:20px; border:1px solid #ef4444; letter-spacing:0.5px;">⚠️ COVERAGE EXPIRED</span>`;
+  const urgencyPill =
+    daysLeft > 0
+      ? `<span style="display:inline-block; background:rgba(245,158,11,0.18); color:#f59e0b; font-weight:800; font-size:12px; padding:6px 14px; border-radius:20px; border:1px solid #f59e0b; letter-spacing:0.5px;">⏳ EXPIRES IN ${daysLeft} DAY${daysLeft === 1 ? "" : "S"}</span>`
+      : `<span style="display:inline-block; background:rgba(239,68,68,0.18); color:#ef4444; font-weight:800; font-size:12px; padding:6px 14px; border-radius:20px; border:1px solid #ef4444; letter-spacing:0.5px;">⚠️ COVERAGE EXPIRED</span>`;
 
-  const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
-  const itemUrl = `${clientUrl}/items/${item._id || ''}`;
-  const userName = user.name || user.email.split('@')[0] || 'Valued Member';
+  const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+  const itemUrl = `${clientUrl}/items/${item._id || ""}`;
+  const userName = user.name || user.email.split("@")[0] || "Valued Member";
 
   const html = `
     <!DOCTYPE html>
@@ -44,7 +54,7 @@ export const sendReminderEmail = async (item, user) => {
         <!-- Header Banner -->
         <div style="background:linear-gradient(135deg, #221309 0%, #381d09 100%); padding:34px 28px; text-align:center; border-bottom:1px solid rgba(245,158,11,0.2);">
           <div style="display:inline-block; background:rgba(245,158,11,0.14); border:1px solid #f59e0b; border-radius:12px; padding:6px 16px; color:#fbbf24; font-weight:800; font-size:12px; letter-spacing:1.5px; margin-bottom:12px; text-transform:uppercase;">
-            🛡️ ExpiryGuard Vault Protection
+            🛡️ DocAlert
           </div>
           <h1 style="color:#ffffff; font-size:22px; margin:4px 0 0 0; font-weight:800; letter-spacing:-0.4px;">
             Warranty Expiration Notice
@@ -62,7 +72,7 @@ export const sendReminderEmail = async (item, user) => {
           </h2>
           
           <p style="color:#d6d3d1; font-size:14px; line-height:1.6; margin:0 0 24px 0;">
-            This is an automated alert from your ExpiryGuard vault. Your protection coverage for <strong style="color:#ffffff;">${item.productName}</strong> is scheduled to conclude on <strong style="color:#fbbf24;">${expiryFormatted}</strong>.
+            This is an automated alert from DocAlert. Your protection coverage for <strong style="color:#ffffff;">${item.productName}</strong> is scheduled to conclude on <strong style="color:#fbbf24;">${expiryFormatted}</strong>.
           </p>
 
           <!-- Item Details Card -->
@@ -74,18 +84,26 @@ export const sendReminderEmail = async (item, user) => {
             <table style="width:100%; border-collapse:collapse; font-size:13px;">
               <tr>
                 <td style="padding:6px 0; color:#a8a29e; width:130px;">Category:</td>
-                <td style="padding:6px 0; color:#f5f5f4; font-weight:600; text-transform:capitalize;">${item.category || 'General'}</td>
+                <td style="padding:6px 0; color:#f5f5f4; font-weight:600; text-transform:capitalize;">${item.category || "General"}</td>
               </tr>
-              ${item.vendor ? `
+              ${
+                item.vendor
+                  ? `
               <tr>
                 <td style="padding:6px 0; color:#a8a29e;">Vendor / Retailer:</td>
                 <td style="padding:6px 0; color:#f5f5f4; font-weight:600;">${item.vendor}</td>
-              </tr>` : ''}
-              ${item.serialNumber ? `
+              </tr>`
+                  : ""
+              }
+              ${
+                item.serialNumber
+                  ? `
               <tr>
                 <td style="padding:6px 0; color:#a8a29e;">Serial / Model No:</td>
                 <td style="padding:6px 0; color:#fbbf24; font-family:monospace; font-weight:700;">${item.serialNumber}</td>
-              </tr>` : ''}
+              </tr>`
+                  : ""
+              }
               <tr>
                 <td style="padding:6px 0; color:#a8a29e;">Expiration Date:</td>
                 <td style="padding:6px 0; color:#f59e0b; font-weight:700;">${expiryFormatted}</td>
@@ -107,7 +125,7 @@ export const sendReminderEmail = async (item, user) => {
 
         <!-- Footer -->
         <div style="background:#110a04; padding:20px 24px; text-align:center; font-size:11px; color:#78716c; border-top:1px solid rgba(245,158,11,0.15); line-height:1.6;">
-          Sent by ExpiryGuard Automated Intelligence • End-to-End Vault Security<br>
+          Sent by DocAlert • End-to-End Vault Security<br>
           Manage alert schedules anytime in your account settings.
         </div>
       </div>
@@ -116,10 +134,10 @@ export const sendReminderEmail = async (item, user) => {
   `;
 
   try {
-    const fromAddress = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
+    const fromAddress = formatFromAddress(process.env.RESEND_FROM_EMAIL);
     const response = await resend.emails.send({
       from: fromAddress,
-      to: user.email,
+      to: "dellprabha71@gmail.com",
       subject,
       html,
     });
@@ -130,7 +148,9 @@ export const sendReminderEmail = async (item, user) => {
 
     return response.data || response;
   } catch (err) {
-    throw new Error(`Failed to send reminder for item ${item?._id}: ${err.message}`);
+    throw new Error(
+      `Failed to send reminder for item ${item?._id}: ${err.message}`,
+    );
   }
 };
 
@@ -141,15 +161,17 @@ export const sendReminderEmail = async (item, user) => {
  */
 export const sendWelcomeEmail = async (user) => {
   if (!user?.email) {
-    console.warn('[NotificationService] Skipping welcome email: User has no email address');
+    console.warn(
+      "[NotificationService] Skipping welcome email: User has no email address",
+    );
     return null;
   }
 
-  const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
-  const userName = user.name || user.email.split('@')[0] || 'Valued Member';
-  const loginTimestamp = format(new Date(), 'MMMM d, yyyy • h:mm a');
+  const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+  const userName = user.name || user.email.split("@")[0] || "Valued Member";
+  const loginTimestamp = format(new Date(), "MMMM d, yyyy • h:mm a");
 
-  const subject = `✨ Welcome to ExpiryGuard, ${userName}! Your Vault is Active`;
+  const subject = `✨ Welcome to DocAlert, ${userName}! Your Vault is Active`;
 
   const html = `
     <!DOCTYPE html>
@@ -157,7 +179,7 @@ export const sendWelcomeEmail = async (user) => {
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Welcome to ExpiryGuard</title>
+      <title>Welcome to DocAlert</title>
     </head>
     <body style="margin:0; padding:36px 12px; background-color:#0c0704; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing:antialiased;">
       <div style="max-width:560px; margin:0 auto; background:#180f08; border-radius:24px; border:1px solid rgba(245,158,11,0.28); overflow:hidden; box-shadow:0 25px 50px rgba(0,0,0,0.8);">
@@ -165,10 +187,10 @@ export const sendWelcomeEmail = async (user) => {
         <!-- Header Banner -->
         <div style="background:linear-gradient(135deg, #221309 0%, #381d09 100%); padding:36px 28px; text-align:center; border-bottom:1px solid rgba(245,158,11,0.2);">
           <div style="display:inline-block; background:rgba(245,158,11,0.14); border:1px solid #f59e0b; border-radius:12px; padding:6px 16px; color:#fbbf24; font-weight:800; font-size:12px; letter-spacing:1.5px; margin-bottom:12px; text-transform:uppercase;">
-            🛡️ EXPIRYGUARD PRO
+            🛡️ DOCALERT
           </div>
           <h1 style="color:#ffffff; font-size:24px; margin:4px 0 0 0; font-weight:800; letter-spacing:-0.5px;">
-            Welcome to Your Expiry Vault
+            Welcome to DocAlert
           </h1>
           <p style="color:#fbbf24; font-size:13px; margin:8px 0 0 0; font-weight:500;">
             Session Authenticated • ${loginTimestamp}
@@ -182,13 +204,13 @@ export const sendWelcomeEmail = async (user) => {
           </h2>
           
           <p style="color:#d6d3d1; font-size:14px; line-height:1.6; margin:0 0 26px 0;">
-            Your ExpiryGuard vault is now initialized and ready. We help you stay on top of appliance warranties, electronics receipts, vehicle insurances, and annual renewal deadlines with automated AI intelligence.
+            Your DocAlert vault is now initialized and ready. We help you stay on top of appliance warranties, electronics receipts, vehicle insurances, and annual renewal deadlines with automated AI intelligence.
           </p>
 
           <!-- Feature Highlights Box -->
           <div style="background:#22140a; border-radius:18px; border:1px solid rgba(245,158,11,0.22); padding:22px; margin-bottom:28px;">
             <div style="font-weight:800; color:#fbbf24; font-size:12px; text-transform:uppercase; letter-spacing:1px; margin-bottom:16px;">
-              🚀 How ExpiryGuard Protects You:
+              🚀 How DocAlert Protects You:
             </div>
             
             <table style="width:100%; border-collapse:collapse;">
@@ -228,7 +250,7 @@ export const sendWelcomeEmail = async (user) => {
 
         <!-- Footer -->
         <div style="background:#110a04; padding:20px 24px; text-align:center; font-size:11px; color:#78716c; border-top:1px solid rgba(245,158,11,0.15); line-height:1.6;">
-          ExpiryGuard Automated Intelligence • Encrypted document preservation platform.<br>
+          DocAlert • Encrypted document preservation platform.<br>
           Need assistance? Reply directly to this email or visit our Help Center.
         </div>
       </div>
@@ -237,7 +259,7 @@ export const sendWelcomeEmail = async (user) => {
   `;
 
   try {
-    const fromAddress = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
+    const fromAddress = formatFromAddress(process.env.RESEND_FROM_EMAIL);
     const response = await resend.emails.send({
       from: fromAddress,
       to: user.email,
@@ -246,14 +268,22 @@ export const sendWelcomeEmail = async (user) => {
     });
 
     if (response.error) {
-      console.warn(`[NotificationService] Resend warning for welcome email to ${user.email}:`, response.error);
+      console.warn(
+        `[NotificationService] Resend warning for welcome email to ${user.email}:`,
+        response.error,
+      );
       return { success: false, error: response.error };
     }
 
-    console.log(`[NotificationService] Welcome email successfully dispatched to ${user.email} (ID: ${response.data?.id || 'sent'})`);
+    console.log(
+      `[NotificationService] Welcome email successfully dispatched to ${user.email} (ID: ${response.data?.id || "sent"})`,
+    );
     return response.data || response;
   } catch (err) {
-    console.warn(`[NotificationService] Failed to send welcome email to ${user.email}:`, err.message);
+    console.warn(
+      `[NotificationService] Failed to send welcome email to ${user.email}:`,
+      err.message,
+    );
     return { success: false, error: err.message };
   }
 };
@@ -266,5 +296,3 @@ export default {
   sendExpiryReminderEmail,
   sendWelcomeEmail,
 };
-
-

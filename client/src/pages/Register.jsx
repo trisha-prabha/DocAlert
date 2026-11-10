@@ -69,7 +69,7 @@ export const Register = () => {
                 </div>
               </div>
               <h1 className="text-2xl font-extrabold text-brown-50 tracking-tight">
-                Create Your <span className="gold-gradient-text">Vault</span>
+                Join <span className="gold-gradient-text">DocAlert</span>
               </h1>
               <p className="text-xs text-brown-300 mt-1">
                 Start protecting your high-value assets and warranties in seconds
@@ -220,7 +220,7 @@ export const Register = () => {
                   <span className="inline-block w-4 h-4 border-2 border-brown-950/40 border-t-brown-950 rounded-full animate-spin" />
                 ) : (
                   <>
-                    <span>Create Vault Account</span>
+                    <span>Create DocAlert Account</span>
                     <ArrowRight className="w-4 h-4 text-brown-950" />
                   </>
                 )}

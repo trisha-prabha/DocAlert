@@ -1,7 +1,7 @@
 {
-  "name": "expiryguard-server",
+  "name": "docalert-server",
   "version": "1.0.0",
-  "description": "ExpiryGuard - AI-powered Warranty and Document Expiry Tracker Backend",
+  "description": "DocAlert - AI-powered warranty and document expiry tracker backend",
   "main": "server.js",
   "type": "module",
   "scripts": {

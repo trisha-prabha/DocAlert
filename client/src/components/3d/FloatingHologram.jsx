@@ -36,7 +36,7 @@ export const FloatingHologram = ({ title = "AI Expiry Protection", subtitle = "N
         {/* Orbiting Satellite 2: Active Protection */}
         <div className="absolute bottom-2 -right-3 bg-brown-900/90 border border-emerald-500/40 rounded-full px-2.5 py-1 text-xs text-emerald-300 flex items-center gap-1.5 shadow-[0_0_15px_rgba(16,185,129,0.25)] animate-bounce" style={{ animationDuration: '4s' }}>
           <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
-          <span className="text-[11px] font-medium">Active Guard</span>
+          <span className="text-[11px] font-medium">DocAlert</span>
         </div>
 
         {/* Orbiting Satellite 3: Multi-channel Reminders */}

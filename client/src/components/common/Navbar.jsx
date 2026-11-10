@@ -69,7 +69,7 @@ export const Navbar = ({ onOpenUpload }) => {
               <div className="flex flex-col">
                 <div className="flex items-center gap-1.5">
                   <span className="font-extrabold text-lg sm:text-xl tracking-tight gold-gradient-text">
-                    ExpiryGuard
+                    DocAlert
                   </span>
                   <span className="text-[10px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-gold-500/20 text-gold-300 border border-gold-500/30">
                     3D Pro

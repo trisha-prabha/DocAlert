@@ -119,7 +119,7 @@ export const AuthProvider = ({ children }) => {
         setUser(data.user);
         localStorage.setItem('expiryguard_token', data.token);
         localStorage.setItem('expiryguard_user', JSON.stringify(data.user));
-        toast.success('Account created! Welcome to ExpiryGuard.', {
+        toast.success('Account created! Welcome to DocAlert.', {
           icon: '✨',
           style: {
             background: '#1e140c',

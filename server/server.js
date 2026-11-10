@@ -71,7 +71,7 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    service: 'ExpiryGuard API',
+    service: 'DocAlert API',
     uptime: process.uptime(),
   });
 });
@@ -92,7 +92,7 @@ initCronJobs();
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, () => {
   console.log(`\n======================================================`);
-  console.log(`🛡️  ExpiryGuard Pro API Server running on port ${PORT}`);
+  console.log(`🛡️  DocAlert API Server running on port ${PORT}`);
   console.log(`📡 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🌐 Base URL: http://localhost:${PORT}/api`);
   console.log(`======================================================\n`);

@@ -345,7 +345,7 @@ export const testUpload = asyncHandler(async (req, res) => {
 // NOTE: Remove before deploying to production
 export const testEmail = asyncHandler(async (req, res) => {
   const recipientEmail = req.body?.email || req.user.email || 'expierytracker@gmail.com';
-  const recipientName = req.user.name || 'ExpiryGuard User';
+  const recipientName = req.user.name || 'DocAlert User';
 
   const mockItem = {
     _id: 'test-item-preview',

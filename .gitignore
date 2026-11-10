@@ -1,5 +1,5 @@
 # ==========================================
-# Root .gitignore - ExpiryGuard
+# Root .gitignore - DocAlert
 # ==========================================
 
 # Environment variables (CRITICAL: Do NOT push to Git)

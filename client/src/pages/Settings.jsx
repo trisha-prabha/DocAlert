@@ -151,7 +151,7 @@ export const Settings = () => {
             </div>
             <div>
               <h2 className="text-base font-bold text-brown-50">Notification & Expiry Reminders</h2>
-              <p className="text-xs text-brown-300">Choose how and when ExpiryGuard alerts you about upcoming deadlines</p>
+              <p className="text-xs text-brown-300">Choose how and when DocAlert alerts you about upcoming deadlines</p>
             </div>
           </div>
 

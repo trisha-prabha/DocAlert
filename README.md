@@ -1,4 +1,4 @@
-# 🛡️ ExpiryGuard — AI-Powered Expiry & Warranty Tracker
+# 🛡️ DocAlert — AI-Powered Expiry & Warranty Tracker
 
 An intelligent full-stack expiry and warranty management system featuring automated AI document extraction, real-time tracking, 3D interactive visuals, and automated multi-stage email reminders.
 

@@ -67,7 +67,7 @@ export const Login = () => {
                 </div>
               </div>
               <h1 className="text-2xl font-extrabold text-brown-50 tracking-tight">
-                Welcome to <span className="gold-gradient-text">ExpiryGuard</span>
+                Welcome to <span className="gold-gradient-text">DocAlert</span>
               </h1>
               <p className="text-xs text-brown-300 mt-1">
                 Enter your credentials or sign in with Google

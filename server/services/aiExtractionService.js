@@ -1,12 +1,12 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import dotenv from 'dotenv';
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import dotenv from "dotenv";
 
 dotenv.config();
 
 const getGenAI = () => {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    throw new Error('GEMINI_API_KEY is not configured in environment');
+    throw new Error("GEMINI_API_KEY is not configured in environment");
   }
   return new GoogleGenerativeAI(apiKey);
 };
@@ -17,7 +17,7 @@ const FALLBACK_OBJECT = {
   vendor: null,
   purchaseDate: null,
   warrantyPeriodMonths: null,
-  category: 'other',
+  category: "other",
 };
 
 /**
@@ -40,11 +40,14 @@ export async function extractDocumentData(fileBuffer, mimeType) {
   "category": one of ["electronics","insurance","subscription","amc","other"]
 }`;
 
-  const validMime = mimeType === 'application/pdf' ? 'application/pdf' : (mimeType || 'image/jpeg');
+  const validMime =
+    mimeType === "application/pdf"
+      ? "application/pdf"
+      : mimeType || "image/jpeg";
 
   const imagePart = {
     inlineData: {
-      data: fileBuffer.toString('base64'),
+      data: fileBuffer.toString("base64"),
       mimeType: validMime,
     },
   };
@@ -52,11 +55,11 @@ export async function extractDocumentData(fileBuffer, mimeType) {
   const makeCall = async () => {
     const genAI = getGenAI();
     // Default model specified: gemini-2.5-flash (with graceful fallback if model is aliased)
-    const modelName = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+    const modelName = process.env.GEMINI_MODEL || "gemini-3.8-flash";
     const model = genAI.getGenerativeModel({ model: modelName });
     const result = await model.generateContent([prompt, imagePart]);
     const text = result.response.text();
-    const cleaned = text.replace(/```(?:json)?|```/g, '').trim();
+    const cleaned = text.replace(/```(?:json)?|```/g, "").trim();
     return JSON.parse(cleaned);
   };
 
@@ -66,22 +69,24 @@ export async function extractDocumentData(fileBuffer, mimeType) {
   } catch (error) {
     const isRateLimit =
       error.status === 429 ||
-      error.message?.includes('429') ||
-      error.message?.toLowerCase().includes('rate limit') ||
-      error.message?.toLowerCase().includes('quota');
+      error.message?.includes("429") ||
+      error.message?.toLowerCase().includes("rate limit") ||
+      error.message?.toLowerCase().includes("quota");
 
     if (isRateLimit) {
-      console.warn('[Gemini AI Rate Limit 429] Retrying after 1-second delay...');
+      console.warn(
+        "[Gemini AI Rate Limit 429] Retrying after 1-second delay...",
+      );
       try {
         await new Promise((resolve) => setTimeout(resolve, 1000));
         return await makeCall();
       } catch (retryError) {
-        console.error('[Gemini AI Retry Failed]:', retryError.message);
+        console.error("[Gemini AI Retry Failed]:", retryError.message);
         return { ...FALLBACK_OBJECT, error: retryError.message };
       }
     }
 
-    console.error('[Gemini AI Document Extraction Error]:', error.message);
+    console.error("[Gemini AI Document Extraction Error]:", error.message);
     return { ...FALLBACK_OBJECT, error: error.message };
   }
 }
